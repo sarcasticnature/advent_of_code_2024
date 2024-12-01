@@ -36,8 +36,9 @@ main = do
     filename_list <- getArgs
     let filename = head filename_list
     contents <- readFile filename
+    let sorted = sortLists $ parseLists $ lines contents
     putStrLn "Part 1:"
-    print $ distances $ sortLists $ parseLists $ lines contents
+    print $ distances $ sorted
     putStrLn "Part 2:"
     -- TODO: combine parsing
-    print $ crunchMap $ buildMap $ sortLists $ parseLists $ lines contents
+    print $ crunchMap $ buildMap $ sorted
