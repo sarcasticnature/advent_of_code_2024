@@ -1,7 +1,6 @@
 import System.Environment (getArgs)
 import System.IO
-import Data.List (foldl', transpose)
-import Text.Read (readMaybe)
+import Data.List (foldl', transpose, intersect)
 import Data.Bifunctor (bimap)
 
 -- Part 1
@@ -48,6 +47,53 @@ parseXmas acc cs =
 
 -- Part 2
 
+diagonalIdx' :: Int -> Int -> ([[(Int, Int)]], [[(Int, Int)]])
+diagonalIdx' height width =
+    let stopRow = height - 3    -- hardcoded for a 3 length search str
+        stopCol = width - 3
+        runIdx x y = zip [x..width-1] [y..height-1]
+        rightUpper = map (`runIdx` 0) [0..stopCol]
+        leftLower = tail $ map (runIdx 0) [0..stopRow]
+        runIdx' x y = zip [x..width-1] [height-1-y,height-2-y..0]
+        rightLower = map (`runIdx'` 0) [0..stopCol]
+        leftUpper = tail $ map (runIdx' 0) [0..stopRow]
+    in  (rightUpper ++ leftLower, rightLower ++ leftUpper)
+
+idxToList' :: [String] -> [(Int, Int)] -> String
+idxToList' puzzle idxs =
+    let idxToChar (x,y) = (puzzle !! y) !! x
+    in  map idxToChar idxs
+
+
+readMas :: String -> Bool
+readMas cs =
+    let xmasFound = (==) 3 $ length $ takeWhile id $ zipWith (==) "MAS" cs
+        samxFound = (==) 3 $ length $ takeWhile id $ zipWith (==) "SAM" cs
+    in  xmasFound || samxFound
+
+collectMas :: [Bool] -> String -> [Bool]
+collectMas acc "" = acc
+collectMas acc cs = collectMas (acc ++ [readMas cs]) $  drop 1 cs
+
+findCross :: [Bool] -> [Bool] -> Int
+findCross a b = sum $ map fromEnum $ zipWith (&&) a b
+
+
+countMas :: String -> Int
+countMas cs =
+    let horizontal = lines cs
+        height = length horizontal
+        width = length $ head horizontal
+        (crissIdx, crossIdx) = diagonalIdx' height width
+        crissStr = map (idxToList' horizontal) crissIdx
+        crossStr = map (idxToList' horizontal) crossIdx
+        crissBool = map (init . (False :) . collectMas []) crissStr
+        crossBool = map (init . (False :) . collectMas []) crossStr
+        crissGood = map snd $ concatMap (filter fst) $ zipWith zip crissBool crissIdx
+        crossGood = map snd $ concatMap (filter fst) $ zipWith zip crossBool crossIdx
+    in  length $ intersect crissGood crossGood
+
+
 main = do
     filename_list <- getArgs
     let filename = head filename_list
@@ -55,3 +101,4 @@ main = do
     putStrLn "Part 1:"
     print $ sum $ map (parseXmas 0) $ combos contents
     putStrLn "Part 2:"
+    print $ countMas contents
