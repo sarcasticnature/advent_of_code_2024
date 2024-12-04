@@ -1,7 +1,6 @@
 import System.Environment (getArgs)
 import System.IO
-import Data.List (foldl', transpose, intersect)
-import Data.Bifunctor (bimap)
+import Data.List (transpose, intersect)
 
 -- Part 1
 
