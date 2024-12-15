@@ -2,6 +2,12 @@ import System.Environment (getArgs)
 import System.IO
 import Data.List (foldl')
 import Data.Char (isNumber)
+import qualified Data.Vector as V
+import qualified Data.Vector.Mutable as MV
+import Control.Monad.ST
+import Control.Monad (zipWithM_)
+import Data.Word
+import Codec.Picture
 
 -- Part 1
 
@@ -44,6 +50,30 @@ safetyFactor ps =
 
 -- Part 2
 
+walk :: (Position, Velocity) -> (Position, Velocity)
+walk ((px, py), (vx, vy)) =
+    let px' = mod (px + vx) width
+        py' = mod (py + vy) height
+    in  ((px', py'), (vx, vy))
+
+posToVec :: [Position] -> V.Vector Word8
+posToVec ps =
+    let empty = do
+            v <- MV.new (width * height) :: ST s (V.MVector s Word8)
+            MV.set v 0
+            return v
+        run acc (x, y) = do
+            v <- acc
+            MV.write v (y * width + x) 255
+            return v
+        res = foldl' run empty ps
+    in  runST $ do v <- res ; V.freeze v
+
+vecToImg :: V.Vector Word8 -> Image Pixel8
+vecToImg v =
+    let gen x y = v V.! (x + y * width)
+    in  generateImage gen width height
+
 main = do
     filename_list <- getArgs
     let filename = head filename_list
@@ -51,3 +81,4 @@ main = do
     putStrLn "Part 1:"
     print $ safetyFactor $ map (simulate . parse) $ lines contents
     putStrLn "Part 2:"
+    zipWithM_ writePng ["./images/" ++ show x ++ ".png" | x <- [0..]] $ map (vecToImg . posToVec) $ take 10000 $ map (map fst) $ iterate (map walk) $ map parse $ lines contents
