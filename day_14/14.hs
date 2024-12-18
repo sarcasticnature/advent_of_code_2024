@@ -67,7 +67,7 @@ posToVec ps =
             MV.write v (y * width + x) 255
             return v
         res = foldl' run empty ps
-    in  runST $ do v <- res ; V.freeze v
+    in  runST $ res >>= V.freeze
 
 vecToImg :: V.Vector Word8 -> Image Pixel8
 vecToImg v =
