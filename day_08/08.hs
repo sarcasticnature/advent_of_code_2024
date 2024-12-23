@@ -12,7 +12,7 @@ index :: [String] -> (String, [Index])
 index cs =
     let height = length cs
         width = length $ head cs
-        run n = zip [0..width - 1] $ repeat n
+        run n = map (, n) [0..width - 1]
     in  (concat cs, concatMap run [0..height - 1])
 
 collectTowers :: (String, [Index]) -> TowerMap
@@ -47,6 +47,29 @@ withinBounds w h (x,y) =
 
 -- Part 2
 
+resonate :: Int -> Int -> Index -> Index -> [Index]
+resonate w h a b = go [a, b]
+    where go is = let (x1, y1) = head is
+                      (x2, y2) = is !! 1
+                      (xn, yn) = last is
+                      rise = y2 - y1
+                      run = x2 - x1
+                      (l, r) = ((x1 - run, y1 - rise), (xn + run, yn + rise))
+                      l' = [l | withinBounds w h l]
+                      r' = [r | withinBounds w h r]
+                      done = null l' && null r'
+                  in  if done then is else go $ l' ++ is ++ r'
+
+computeAntiNodes' :: Int -> Int -> [Index] -> [Index] -> [Index]
+computeAntiNodes' w h acc [] = acc
+computeAntiNodes' w h acc (t:ts) =
+    let as = concatMap (resonate w h t) ts
+    in  computeAntiNodes' w h (as ++ acc) ts
+
+findAntiNodes' :: Int -> Int -> TowerMap -> [Index]
+findAntiNodes' w h = HM.foldl' f []
+    where f acc idxs = computeAntiNodes' w h [] idxs ++ acc
+
 main = do
     filename_list <- getArgs
     let filename = head filename_list
@@ -57,3 +80,4 @@ main = do
     let width = length $ head l
     print $ length $ nub $ filter (withinBounds width height) $ findAntiNodes $ collectTowers $ index $ lines contents
     putStrLn "Part 2:"
+    print $ length $ nub $ findAntiNodes' width height $ collectTowers $ index $ lines contents
