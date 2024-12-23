@@ -2,6 +2,7 @@ import System.Environment (getArgs)
 import System.IO
 import Control.Monad.State
 import Data.Bits (xor)
+import Data.List (isPrefixOf)
 
 -- Part 1
 
@@ -71,12 +72,40 @@ step = execState run
 
 -- Part 2
 
+getInstructions :: String -> String
+getInstructions = drop 9 . last . lines
+
+parseInstructions :: String -> Program
+parseInstructions cs =
+    let ns = map read $ splitOn ',' cs
+        chunk [] = []
+        chunk (o:n:xs) = (o, n) : chunk xs
+    in  chunk ns
+
+increment :: (Registers, Program) -> (Registers, Program)
+increment (Registers a b c ip tx, p) = (Registers (a + 1) b c ip tx, p)
+
+valid :: String -> Registers -> Bool
+valid cs (Registers a b c ip tx) = cs == tx -- && ip >= instructionCount
+
 main = do
     filename_list <- getArgs
     let filename = head filename_list
     contents <- readFile filename
+
     putStrLn "Part 1:"
     let initialState = execState (parse contents) (Registers 0 0 0 0 [], [])
     let pred = (>) instructionCount . ip . fst
     print $ tx $ fst $ last $ takeWhile pred $ iterate step initialState
+
     putStrLn "Part 2:"
+    let instructions = getInstructions contents
+    let initialState' = (Registers 0 0 0 0 [], parseInstructions instructions)
+    let pred' = flip isPrefixOf instructions . tx . fst
+    --let step' = fst . last . takeWhile pred . iterate step
+    let step' = fst . last . takeWhile (\x -> pred' x && pred x) . iterate step
+    --print $ head $ drop 117440 $ iterate increment initialState'
+    --print $ head $ map (valid instructions . step') $ drop 117440 $ iterate increment initialState'
+    --print $ fst $ head $ dropWhile (not . valid instructions . snd) $ zip [0..] $ map step' $ iterate increment initialState'
+    mapM_ (print . fst) $ zip [0..] $ map step' $ iterate increment initialState'
+    --mapM_ print $ zip [0..] $ map (not . valid instructions . step') $ iterate increment initialState'
