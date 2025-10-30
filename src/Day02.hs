@@ -1,5 +1,5 @@
-import System.Environment (getArgs)
-import System.IO
+module Day02 (day02) where
+
 import Data.List (foldl')
 
 -- Part 1
@@ -37,9 +37,8 @@ listSafe' ls =
     let up = head ls < (ls !! 1)
     in  and $ zipWith (levelSafe up) ls $ tail ls
 
-main = do
-    filename_list <- getArgs
-    let filename = head filename_list
+day02 :: String -> IO ()
+day02 filename = do
     contents <- readFile filename
     putStrLn "Part 1:"
     print $ foldl' (flip ((+) . fromEnum)) 0 $ map reportSafe $ lines contents

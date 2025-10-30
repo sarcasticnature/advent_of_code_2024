@@ -1,5 +1,6 @@
-import System.Environment (getArgs)
-import System.IO
+{-# LANGUAGE TupleSections #-}
+module Day08 (day08) where
+
 import Data.List (foldl', nub)
 import qualified Data.HashMap.Strict as HM
 
@@ -70,9 +71,8 @@ findAntiNodes' :: Int -> Int -> TowerMap -> [Index]
 findAntiNodes' w h = HM.foldl' f []
     where f acc idxs = computeAntiNodes' w h [] idxs ++ acc
 
-main = do
-    filename_list <- getArgs
-    let filename = head filename_list
+day08 :: String -> IO ()
+day08 filename = do
     contents <- readFile filename
     putStrLn "Part 1:"
     let l = lines contents

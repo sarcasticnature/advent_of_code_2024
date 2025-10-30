@@ -1,5 +1,5 @@
-import System.Environment (getArgs)
-import System.IO
+module Day01 (day01) where
+
 import Data.List (sort, foldl')
 import Data.Bifunctor (bimap)
 
@@ -9,6 +9,7 @@ parseLine cs = (l, r)
           l = read $ head ws
           r = read $ last ws
 
+folder :: ([Int], Int) -> Int -> ([Int], Int)
 folder (rs, acc) l = let cnt = length $ takeWhile (l ==) $ dropWhile (l >) rs
                          rs' = dropWhile (l >) rs
                      in  (rs', acc + l * cnt)
@@ -16,9 +17,8 @@ folder (rs, acc) l = let cnt = length $ takeWhile (l ==) $ dropWhile (l >) rs
 similarity :: ([Int], [Int]) -> Int
 similarity (ls, rs) = snd $ foldl' folder (rs, 0) ls
 
-main = do
-    filename_list <- getArgs
-    let filename = head filename_list
+day01 :: String -> IO ()
+day01 filename = do
     contents <- readFile filename
     let sorted = bimap sort sort $ unzip $ map parseLine $ lines contents
     putStrLn "Part 1:"

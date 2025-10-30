@@ -1,5 +1,5 @@
-import System.Environment (getArgs)
-import System.IO
+module Day04 (day04) where
+
 import Data.List (transpose, intersect)
 
 -- Part 1
@@ -93,9 +93,8 @@ countMas cs =
     in  length $ intersect crissGood crossGood
 
 
-main = do
-    filename_list <- getArgs
-    let filename = head filename_list
+day04 :: String -> IO ()
+day04 filename = do
     contents <- readFile filename
     putStrLn "Part 1:"
     print $ sum $ map (parseXmas 0) $ combos contents

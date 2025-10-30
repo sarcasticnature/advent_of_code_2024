@@ -1,5 +1,5 @@
-import System.Environment (getArgs)
-import System.IO
+module Day14 (day14) where
+
 import Data.List (foldl')
 import Data.Char (isNumber)
 import qualified Data.Vector as V
@@ -74,9 +74,8 @@ vecToImg v =
     let gen x y = v V.! (x + y * width)
     in  generateImage gen width height
 
-main = do
-    filename_list <- getArgs
-    let filename = head filename_list
+day14 :: String -> IO ()
+day14 filename = do
     contents <- readFile filename
     putStrLn "Part 1:"
     print $ safetyFactor $ map (simulate . parse) $ lines contents

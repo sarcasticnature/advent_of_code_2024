@@ -1,5 +1,5 @@
-import System.Environment (getArgs)
-import System.IO
+module Day07 (day07) where
+
 import Data.List (nub)
 
 -- Part 1
@@ -33,9 +33,8 @@ equationCount' cs =
         options = combos' [] ns :: [Int]
     in  nub $ filter (goal ==) options
 
-main = do
-    filename_list <- getArgs
-    let filename = head filename_list
+day07 :: String -> IO ()
+day07 filename = do
     contents <- readFile filename
     putStrLn "Part 1:"
     print $ sum $ concatMap equationCount $ lines contents

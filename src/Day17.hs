@@ -1,5 +1,5 @@
-import System.Environment (getArgs)
-import System.IO
+module Day17 (day17) where
+
 import Control.Monad.State
 import Data.Bits (xor)
 import Data.List (isPrefixOf)
@@ -88,9 +88,8 @@ increment (Registers a b c ip tx, p) = (Registers (a + 1) b c ip tx, p)
 valid :: String -> Registers -> Bool
 valid cs (Registers a b c ip tx) = cs == tx -- && ip >= instructionCount
 
-main = do
-    filename_list <- getArgs
-    let filename = head filename_list
+day17 :: String -> IO ()
+day17 filename = do
     contents <- readFile filename
 
     putStrLn "Part 1:"

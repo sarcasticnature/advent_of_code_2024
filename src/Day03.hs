@@ -1,11 +1,10 @@
-import System.Environment (getArgs)
-import System.IO
+module Day03 (day03) where
+
 import Data.List (foldl')
 import Data.Char (isNumber)
 import Text.Read (readMaybe)
 
 -- Part 1
-
 
 readMul :: String -> Either Int (Int, Int)
 readMul cs =
@@ -61,9 +60,8 @@ parseMulDo b acc cs = case (readDo cs, readMul cs) of
                            else parseMulDo b acc $ drop cnt cs
     (Nothing, Left cnt)  -> parseMulDo b acc $ drop cnt cs
 
-main = do
-    filename_list <- getArgs
-    let filename = head filename_list
+day03 :: String -> IO ()
+day03 filename = do
     contents <- readFile filename
     putStrLn "Part 1:"
     print $ parseMul 0 contents

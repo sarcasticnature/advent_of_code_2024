@@ -1,5 +1,5 @@
-import System.Environment (getArgs)
-import System.IO
+module Day09 (day09) where
+
 import Data.List (foldl', elemIndex)
 import Data.Char (digitToInt)
 
@@ -69,9 +69,8 @@ convert = concatMap toInts
               (File cnt n) -> replicate cnt n
               (Free cnt)   -> replicate cnt 0
 
-main = do
-    filename_list <- getArgs
-    let filename = head filename_list
+day09 :: String -> IO ()
+day09 filename = do
     contents <- readFile filename
     putStrLn "Part 1:"
     print $ sum $ zipWith (*) [0..] $ defrag $ toBlocks [] 0 $ map digitToInt $ init contents
