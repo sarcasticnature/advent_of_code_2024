@@ -14,6 +14,7 @@ pickDay day
   | day == "7" = day07
   | day == "8" = day08
   | day == "9" = day09
+  | day == "10" = day10
   | day == "14" = day14
   | day == "17" = day17
   | otherwise = \_ -> print "Specified day is unimplemented"
