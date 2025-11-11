@@ -9,6 +9,7 @@ module AoCLib
     day08,
     day09,
     day10,
+    day11,
     day14,
     day17,
   )
@@ -24,5 +25,6 @@ import Day07
 import Day08
 import Day09
 import Day10
+import Day11
 import Day14
 import Day17
