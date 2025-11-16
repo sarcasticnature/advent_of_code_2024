@@ -3,7 +3,7 @@
 module Day13 (day13) where
 
 import Lens.Micro
-import Lens.Micro.Extras (view)
+-- import Lens.Micro.Extras (view)
 import Lens.Micro.TH
 
 -- Part 1
@@ -40,11 +40,21 @@ parse cs =
       parseM err = error $ "bad number of lines when parsing machine: " ++ show (length err)
    in map parseM ms
 
+play :: Machine -> Int
+play m =
+  let d = (m ^. a . x * m ^. b . y) - (m ^. b . x * m ^. a . y)
+      d_x = (m ^. prize . x * m ^. b . y) - (m ^. b . x * m ^. prize . y)
+      d_y = (m ^. a . x * m ^. prize . y) - (m ^. prize . x * m ^. a . y)
+      valid = d_x `mod` d == 0 && d_y `mod` d == 0
+      x_ = d_x `quot` d
+      y_ = d_y `quot` d
+   in if valid then 3 * x_ + y_ else 0
+
 -- Part 2
 
 day13 :: String -> IO ()
 day13 filename = do
   contents <- readFile filename
   putStrLn "\nPart 1:"
-  print $ parse contents
+  print $ sum $ map play $ parse contents
   putStrLn "\nPart 2:"
