@@ -52,9 +52,16 @@ play m =
 
 -- Part 2
 
+unitConversion :: Machine -> Machine
+unitConversion m = over (prize . y) (+ n) $ over (prize . x) (+ n) m
+  where
+    n = 10000000000000
+
 day13 :: String -> IO ()
 day13 filename = do
   contents <- readFile filename
+  let machines = parse contents
   putStrLn "\nPart 1:"
-  print $ sum $ map play $ parse contents
+  print $ sum $ map play machines
   putStrLn "\nPart 2:"
+  print $ sum $ map (play . unitConversion) machines
